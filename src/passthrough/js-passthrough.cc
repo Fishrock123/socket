@@ -296,7 +296,6 @@ napi_value PassThrough::BindSource(napi_env env, napi_callback_info info) {
   BOB::Base* source_obj;
   status = napi_unwrap(env, source, reinterpret_cast<void**>(&source_obj));
   if (source_obj != nullptr && status == napi_ok) {
-    printf("bound c++ source!\n");
     obj->source_ = source_obj;
   }
 
@@ -331,7 +330,6 @@ napi_value PassThrough::BindSink(napi_env env, napi_callback_info info) {
   BOB::Base* sink_obj;
   status = napi_unwrap(env, argv[0], reinterpret_cast<void**>(&sink_obj));
   if (sink_obj != nullptr && status == napi_ok) {
-    printf("bound c++ sink!\n");
     obj->sink_ = sink_obj;
   }
 
@@ -384,8 +382,6 @@ napi_value PassThrough::Next(napi_env env, napi_callback_info info) {
     int bytes;
     status = napi_get_value_int32(env, argv[3], &bytes);
     NAPI_CHECK(status, env);
-
-    printf("C++ -> C++ next!\n");
 
     obj->sink_->Next(bob_status, reinterpret_cast<void**>(&argv[1]), data, bytes);
 
@@ -440,8 +436,6 @@ napi_value PassThrough::Pull(napi_env env, napi_callback_info info) {
                                   reinterpret_cast<void**>(&data),
                                   &size);
     NAPI_CHECK(status, env);
-
-    printf("C++ -> C++ pull!\n");
 
     obj->source_->Pull(reinterpret_cast<void**>(&argv[0]), data, size);
 
