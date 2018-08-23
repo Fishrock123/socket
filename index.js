@@ -41,5 +41,5 @@ socket.connect(ip, port, connect_err => {
   stdout.start()
 
   queue.send(`${method} ${path} HTTP/1.1\r\nHost: ${ip}\r\nConnection: keep-alive\r\n`)
-  queue.send('\r\n0\r\n')
+  queue.send('\r\n')
 })
