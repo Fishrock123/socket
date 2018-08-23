@@ -1,4 +1,4 @@
-# BOB Status
+# TCP Socket
 
 TCP Socket, Source & Sink using the [BOB](https://github.com/Fishrock123/bob) streaming protocol.
 
