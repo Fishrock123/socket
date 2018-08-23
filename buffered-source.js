@@ -34,7 +34,6 @@ class BufferedSource extends EventEmitter {
 
         this.sink.next(status_type.continue, null, buffer, bytesWritten)
 
-        console.log(this.buffer.length, bytesWritten, this.writePos)
         this.buffer.copy(this.buffer, 0, bytesWritten, this.writePos)
         this.writePos -= bytesWritten
     }
