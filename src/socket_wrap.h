@@ -21,6 +21,9 @@ class Socket_Wrap : public Napi::ObjectWrap<Socket_Wrap> {
 
   PassThrough* source_pt_;
   PassThrough* sink_pt_;
+
+  Napi::FunctionReference cb_ref_;
+  Napi::Env env_;
 };
 
 #endif

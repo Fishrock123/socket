@@ -26,7 +26,7 @@ Socket::~Socket() {
   delete[] buf_.base;
 }
 
-void Socket::Connect(const char* ip, int port) {
+void Socket::Connect(const char* ip, int port, void* data, socket_connect_cb_t callback) {
   sockaddr_in addr_in;
   int err = uv_ip4_addr(ip, port, &addr_in);
   if (err != 0) {
@@ -35,8 +35,18 @@ void Socket::Connect(const char* ip, int port) {
   }
   addr_ = reinterpret_cast<sockaddr *>(&addr_in);
 
+  connect_cb_data_t* cb_data = new connect_cb_data_t;
+  cb_data->data = data;
+  cb_data->callback = callback;
+
+  req_.data = static_cast<void*>(cb_data);
   uv_tcp_connect(&req_, tcp_, addr_, [](uv_connect_t* req, int status) {
-    printf("TCP CONNECT STATUS: %s - %s\n", uv_strerror(status), uv_err_name(status));
+    connect_cb_data_t* data = reinterpret_cast<connect_cb_data_t*>(req->data);
+    socket_connect_cb_t callback = data->callback;
+    if (callback != nullptr) {
+      callback(status, data->data);
+    }
+    delete data;
   });
 }
 

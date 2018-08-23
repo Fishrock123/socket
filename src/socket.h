@@ -7,12 +7,19 @@
 #include "sink.h"
 #include "source.h"
 
+typedef void (*socket_connect_cb_t)(int status, void* data);
+
+typedef struct connect_cb_data_t {
+  void* data;
+  socket_connect_cb_t callback;
+} connect_cb_data_t;
+
 class Socket {
  public:
   Socket(uv_loop_t* loop, uint32_t bufsize);
   virtual ~Socket();
 
-  virtual void Connect(const char* ip, int port);
+  virtual void Connect(const char* ip, int port, void* data, socket_connect_cb_t callback);
   virtual void Start();
   virtual void Stop();
 

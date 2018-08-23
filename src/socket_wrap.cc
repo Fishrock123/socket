@@ -22,8 +22,10 @@ Napi::Object Socket_Wrap::Init(Napi::Env env, Napi::Object exports) {
   return exports;
 }
 
-Socket_Wrap::Socket_Wrap(const Napi::CallbackInfo& info) : Napi::ObjectWrap<Socket_Wrap>(info)  {
-  Napi::Env env = info.Env();
+Socket_Wrap::Socket_Wrap(const Napi::CallbackInfo& info) 
+    : Napi::ObjectWrap<Socket_Wrap>(info),
+      env_(info.Env()) {
+  Napi::Env env = env_;
   Napi::HandleScope scope(env);
 
   uv_loop_t* loop;
@@ -55,15 +57,39 @@ Napi::Value Socket_Wrap::Connect(const Napi::CallbackInfo& info) {
 
   int length = info.Length();
 
-  if (length <= 0) {
-    Napi::TypeError::New(env, "Socket.Connect() expected two arguments").ThrowAsJavaScriptException();
+  if (length != 2 && length != 3) {
+    Napi::TypeError::New(env, "Socket.Connect() expects two or three arguments").ThrowAsJavaScriptException();
   } else if (!info[0].IsString()) {
-    Napi::TypeError::New(env, "Socket.Connect() expected argument 0 to be String").ThrowAsJavaScriptException();
+    Napi::TypeError::New(env, "Socket.Connect() expected argument [0] to be String").ThrowAsJavaScriptException();
   } if (!info[1].IsNumber()) {
-    Napi::TypeError::New(env, "Socket.Connect() expected argument 1 to be Number").ThrowAsJavaScriptException();
+    Napi::TypeError::New(env, "Socket.Connect() expected argument [1] to be Number").ThrowAsJavaScriptException();
   }
 
-  this->socket_->Connect(info[0].ToString().Utf8Value().c_str(), info[1].ToNumber().Uint32Value());
+  void* cb_data = nullptr;
+  if (length == 3) {
+    if (!info[2].IsFunction()) {
+      Napi::TypeError::New(env, "Socket.Connect() expected argument [2] to be Function").ThrowAsJavaScriptException();
+    } else {
+      cb_ref_ = Napi::Persistent(info[2].As<Napi::Function>());
+
+      cb_data = static_cast<void*>(this);
+    }
+  }
+
+  const char* ip = info[0].ToString().Utf8Value().c_str();
+  const uint32_t port = info[1].ToNumber().Uint32Value();
+
+  this->socket_->Connect(ip, port, cb_data, [](int status, void* cb_data) {
+    if (cb_data != nullptr) {
+      Socket_Wrap* self = static_cast<Socket_Wrap*>(cb_data);
+      Napi::HandleScope scope(self->env_);
+
+      size_t argc = 1;
+      napi_value argv = Napi::Number::New(self->env_, status);
+      self->cb_ref_.Value().MakeCallback(Napi::Object::New(self->env_), argc, &argv);
+      self->cb_ref_.Unref();
+    }
+  });
 
   return Napi::Value();
 }
