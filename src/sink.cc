@@ -8,7 +8,8 @@
 Socket_Sink::Socket_Sink(uv_tcp_t* tcp, uint32_t bufsize)
     : source_(nullptr),
       tcp_(tcp),
-      req_() {
+      w_req_(),
+      s_req_() {
   buf_ = uv_buf_init(new char[bufsize], bufsize);
 }
 
@@ -42,12 +43,24 @@ void Socket_Sink::Next(int bob_status, void** error, char* data, size_t bytes) {
 
   int err;
 
+  if (bob_status != BOB::CONTINUE) {
+    uv_stream_t* stream = reinterpret_cast<uv_stream_t*>(tcp_);
+    err = uv_shutdown(&s_req_, stream, [](uv_shutdown_t* req, int status) {
+      if (status != 0) {
+        printf("Shutdown: %s\n", uv_err_name(status));
+      } else {
+        printf("Clean shutdown\n");
+      }
+    });
+    return;
+  }
+
   uv_buf_t buf = uv_buf_init(const_cast<char*>(data), bytes);
 
-  req_.data = static_cast<void*>(this);
+  w_req_.data = static_cast<void*>(this);
 
   uv_stream_t* stream = reinterpret_cast<uv_stream_t*>(tcp_);
-  err = uv_write(&req_, 
+  err = uv_write(&w_req_, 
                  stream, 
                  &buf, 
                  1u, 
