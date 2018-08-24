@@ -19,7 +19,7 @@ class Socket {
   Socket(uv_loop_t* loop, uint32_t bufsize);
   virtual ~Socket();
 
-  virtual void Connect(const char* ip, int port, void* data, socket_connect_cb_t callback);
+  virtual void Connect(sockaddr* addr, void* data, socket_connect_cb_t callback);
   virtual void Start();
   virtual void Stop();
 

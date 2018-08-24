@@ -26,14 +26,8 @@ Socket::~Socket() {
   delete[] buf_.base;
 }
 
-void Socket::Connect(const char* ip, int port, void* data, socket_connect_cb_t callback) {
-  sockaddr_in addr_in;
-  int err = uv_ip4_addr(ip, port, &addr_in);
-  if (err != 0) {
-    printf("IPv4 ADDR: %s - %s\n", uv_strerror(err), uv_err_name(err));
-    assert(false);
-  }
-  addr_ = reinterpret_cast<sockaddr *>(&addr_in);
+void Socket::Connect(sockaddr* addr, void* data, socket_connect_cb_t callback) {
+  addr_ = addr;
 
   connect_cb_data_t* cb_data = new connect_cb_data_t;
   cb_data->data = data;

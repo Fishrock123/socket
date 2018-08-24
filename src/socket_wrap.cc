@@ -22,7 +22,7 @@ Napi::Object Socket_Wrap::Init(Napi::Env env, Napi::Object exports) {
   return exports;
 }
 
-Socket_Wrap::Socket_Wrap(const Napi::CallbackInfo& info) 
+Socket_Wrap::Socket_Wrap(const Napi::CallbackInfo& info)
     : Napi::ObjectWrap<Socket_Wrap>(info),
       env_(info.Env()) {
   Napi::Env env = env_;
@@ -76,10 +76,19 @@ Napi::Value Socket_Wrap::Connect(const Napi::CallbackInfo& info) {
     }
   }
 
-  const char* ip = info[0].ToString().Utf8Value().c_str();
-  const uint32_t port = info[1].ToNumber().Uint32Value();
+  sockaddr_in addr_in;
 
-  this->socket_->Connect(ip, port, cb_data, [](int status, void* cb_data) {
+  const uint32_t port = info[1].ToNumber().Uint32Value();
+  const char* ip = info[0].ToString().Utf8Value().c_str();
+
+  int err = uv_ip4_addr(ip, port, &addr_in);
+  if (err != 0) {
+    printf("IPv4 ADDR: %s - %s\n", uv_strerror(err), uv_err_name(err));
+    assert(false);
+  }
+  sockaddr* addr = reinterpret_cast<sockaddr *>(&addr_in);
+
+  this->socket_->Connect(addr, cb_data, [](int status, void* cb_data) {
     if (cb_data != nullptr) {
       Socket_Wrap* self = static_cast<Socket_Wrap*>(cb_data);
       Napi::HandleScope scope(self->env_);
