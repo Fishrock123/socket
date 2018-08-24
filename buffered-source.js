@@ -14,6 +14,7 @@ class BufferedSource extends EventEmitter {
 
         this.bytesToWrite = 0
         this.writePos = 0
+        this.ended = false
     }
 
     bindSink(sink) {
@@ -26,7 +27,11 @@ class BufferedSource extends EventEmitter {
         }
 
         if (!this.bytesToWrite) {
+          if (this.ended) {
+            return this.sink.next(status_type.end, null, buffer, 0)
+          } else {
             return this.once('send', _ => this.pull(error, buffer))
+          }
         }
 
         const bytesWritten = this.buffer.copy(buffer, 0, 0, this.bytesToWrite)
@@ -43,13 +48,22 @@ class BufferedSource extends EventEmitter {
             buffer = Buffer.from(buffer)
         }
         if (!Buffer.isBuffer(buffer)) {
-            throw new TypeError("send()'s argument must be a String or Buffer!")
+            throw new TypeError('send()\'s argument must be a String or Buffer!')
         }
+
+        if (this.ended) {
+          throw new Error('Messages cannot be send after end()!')
+        }
+
         buffer.copy(this.buffer, this.writePos)
         this.bytesToWrite += buffer.length
         this.writePos += buffer.length
 
         this.emit('send')
+    }
+
+    end() {
+      this.ended = true
     }
 }
 
