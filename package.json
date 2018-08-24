@@ -11,6 +11,7 @@
   "dependencies": {
     "bob-base": "0.0.2",
     "bob-status": "0.0.0",
+    "fs-source": "0.0.2",
     "node-addon-api": "^1.4.0"
   }
 }

@@ -30,6 +30,7 @@ const ip = process.argv[2]
 const port = Number(process.argv[3])
 const method = 'GET'
 const path = '/'
+const filePath = process.argv[4] || null
 
 socket.connect(ip, port, connect_err => {
   if (connect_err) {
@@ -41,5 +42,15 @@ socket.connect(ip, port, connect_err => {
   stdout.start()
 
   queue.send(`${method} ${path} HTTP/1.1\r\nHost: ${ip}\r\nConnection: keep-alive\r\n`)
-  queue.send('\r\n')
+  
+  if (filePath !== null) {
+    const FileSource = require('fs-source')
+
+    const source = new FileSource(filePath)
+
+    socket.sink.bindSource(source)
+  } else {
+    queue.send('\r\n')
+    queue.end()
+  }
 })
