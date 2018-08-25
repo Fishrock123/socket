@@ -17,7 +17,7 @@ Socket::Socket(uv_loop_t *loop, uint32_t bufsize)
   tcp_->data = this;
 
   source_ = new Socket_Source(tcp_);
-  sink_ = new Socket_Sink(tcp_, 1024);
+  sink_ = new Socket_Sink(tcp_, 64 * 1024);
 }
 
 Socket::~Socket() {
