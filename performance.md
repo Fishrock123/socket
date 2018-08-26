@@ -16,7 +16,7 @@ Extra info:
 
 Output from `/usr/bin/time`:
 ```
-      330.43 real         7.29 user        13.94 sys
+      410.24 real         8.62 user        18.40 sys
 ```
 
 
@@ -26,5 +26,5 @@ Output from `/usr/bin/time`:
 
 Output from `/usr/bin/time`:
 ```
-       18.49 real         0.46 user         0.83 sys
+      419.66 real         7.51 user        18.14 sys
 ```
