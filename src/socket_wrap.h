@@ -17,6 +17,8 @@ class Socket_Wrap : public Napi::ObjectWrap<Socket_Wrap> {
   Napi::Value Start(const Napi::CallbackInfo& info);
   Napi::Value Stop(const Napi::CallbackInfo& info);
 
+  Napi::Reference<Napi::Value> self_;
+
   Socket* socket_;
 
   PassThrough* source_pt_;

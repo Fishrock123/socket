@@ -27,6 +27,8 @@ Socket_Wrap::Socket_Wrap(const Napi::CallbackInfo& info)
       env_(info.Env()) {
   Napi::Env env = env_;
   Napi::HandleScope scope(env);
+  
+  self_ = Napi::Persistent(info.This());
 
   uv_loop_t* loop;
   napi_status status;
