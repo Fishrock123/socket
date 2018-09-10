@@ -9,10 +9,10 @@
 
 typedef void (*socket_connect_cb_t)(int status, void* data);
 
-typedef struct connect_cb_data_t {
+typedef struct socket_connect_cb_data_t {
   void* data;
   socket_connect_cb_t callback;
-} connect_cb_data_t;
+} socket_connect_cb_data_t;
 
 class Socket {
  public:

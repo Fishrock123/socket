@@ -29,13 +29,13 @@ Socket::~Socket() {
 void Socket::Connect(sockaddr* addr, void* data, socket_connect_cb_t callback) {
   addr_ = addr;
 
-  connect_cb_data_t* cb_data = new connect_cb_data_t;
+  socket_connect_cb_data_t* cb_data = new socket_connect_cb_data_t;
   cb_data->data = data;
   cb_data->callback = callback;
 
   req_.data = static_cast<void*>(cb_data);
   uv_tcp_connect(&req_, tcp_, addr_, [](uv_connect_t* req, int status) {
-    connect_cb_data_t* data = reinterpret_cast<connect_cb_data_t*>(req->data);
+    socket_connect_cb_data_t* data = reinterpret_cast<socket_connect_cb_data_t*>(req->data);
     socket_connect_cb_t callback = data->callback;
     if (callback != nullptr) {
       callback(status, data->data);
