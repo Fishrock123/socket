@@ -8,7 +8,11 @@
 class Socket_Wrap : public Napi::ObjectWrap<Socket_Wrap> {
  public:
   static Napi::Object Init(Napi::Env env, Napi::Object exports);
+  static Socket_Wrap* New(Socket* socket);
   Socket_Wrap(const Napi::CallbackInfo& info);
+  
+  void ResetSocket(Socket* socket);
+  Napi::Value Value();
 
  private:
   static Napi::FunctionReference constructor;

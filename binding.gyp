@@ -14,9 +14,11 @@
       ],
       "sources": [
         "src/addon.cc",
-        "src/sink.cc",
         "src/socket_wrap.cc",
         "src/socket.cc",
+        "src/server_wrap.cc",
+        "src/server.cc",
+        "src/sink.cc",
         "src/source.cc",
         "src/passthrough/js-passthrough.cc"
       ],

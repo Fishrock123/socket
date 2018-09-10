@@ -53,6 +53,21 @@ Socket_Wrap::Socket_Wrap(const Napi::CallbackInfo& info)
   source_pt_->BindSource(socket_->source_);
 }
 
+Socket_Wrap* Socket_Wrap::New(Socket* socket) {
+  Napi::Object js_this = constructor.Value().New(0, {});
+  
+  Socket_Wrap* self = Napi::ObjectWrap<Socket_Wrap>::Unwrap(js_this);
+  
+  self->ResetSocket(socket);
+  
+  return self;
+}
+
+void Socket_Wrap::ResetSocket(Socket* socket) {
+  delete socket_;
+  socket_ = socket;
+}
+
 Napi::Value Socket_Wrap::Connect(const Napi::CallbackInfo& info) {
   Napi::Env env = info.Env();
   Napi::HandleScope scope(env);
@@ -121,4 +136,8 @@ Napi::Value Socket_Wrap::Stop(const Napi::CallbackInfo& info) {
   socket_->Stop();
 
   return Napi::Value();
+}
+
+Napi::Value Socket_Wrap::Value() {
+  return self_.Value();
 }
