@@ -1,5 +1,5 @@
-#ifndef MYOBJECT_H
-#define MYOBJECT_H
+#ifndef BOB_SOCKET_WRAP_H_
+#define BOB_SOCKET_WRAP_H_
 
 #include <napi.h>
 #include "socket.h"
@@ -28,4 +28,4 @@ class Socket_Wrap : public Napi::ObjectWrap<Socket_Wrap> {
   Napi::Env env_;
 };
 
-#endif
+#endif // BOB_SOCKET_WRAP_H_

@@ -1,5 +1,5 @@
-#ifndef Socket_Source_H_
-#define Socket_Source_H_
+#ifndef BOB_SOCKET_SOURCE_H_
+#define BOB_SOCKET_SOURCE_H_
 
 #include <uv.h>
 #include <bob.h>
@@ -22,4 +22,4 @@ class Socket_Source : public BOB::Base {
   uv_tcp_t* tcp_;
 };
 
-#endif  // Socket_Source_H_
+#endif  // BOB_SOCKET_SOURCE_H_

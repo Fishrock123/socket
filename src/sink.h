@@ -1,5 +1,5 @@
-#ifndef Socket_Sink_H_
-#define Socket_Sink_H_
+#ifndef BOB_SOCKET_SINK_H_
+#define BOB_SOCKET_SINK_H_
 
 #include <uv.h>
 #include <bob.h>
@@ -27,4 +27,4 @@ class Socket_Sink : public BOB::Base {
   uv_buf_t buf_;
 };
 
-#endif  // Socket_Sink_H_
+#endif  // BOB_SOCKET_SINK_H_
