@@ -35,7 +35,7 @@ Socket_Wrap::Socket_Wrap(const Napi::CallbackInfo& info)
   status = napi_get_uv_event_loop(env, &loop);
   NAPI_CHECK(status, env);
 
-  this->socket_ = new Socket(loop, 1024);
+  socket_ = new Socket(loop, 1024);
 
   Napi::Object self = info.This().ToObject();
 
@@ -49,8 +49,8 @@ Socket_Wrap::Socket_Wrap(const Napi::CallbackInfo& info)
   sink_pt_ = Napi::ObjectWrap<PassThrough>::Unwrap(sink.ToObject());
   self.DefineProperty(Napi::PropertyDescriptor::Value("sink", sink_pt_->GetJSObject(env)));
 
-  this->socket_->sink_->BindSource(sink_pt_);
-  source_pt_->BindSource(this->socket_->source_);
+  socket_->sink_->BindSource(sink_pt_);
+  source_pt_->BindSource(socket_->source_);
 }
 
 Napi::Value Socket_Wrap::Connect(const Napi::CallbackInfo& info) {
@@ -90,7 +90,7 @@ Napi::Value Socket_Wrap::Connect(const Napi::CallbackInfo& info) {
   }
   sockaddr* addr = reinterpret_cast<sockaddr *>(&addr_in);
 
-  this->socket_->Connect(addr, cb_data, [](int status, void* cb_data) {
+  socket_->Connect(addr, cb_data, [](int status, void* cb_data) {
     if (cb_data != nullptr) {
       Socket_Wrap* self = static_cast<Socket_Wrap*>(cb_data);
       Napi::HandleScope scope(self->env_);
@@ -109,7 +109,7 @@ Napi::Value Socket_Wrap::Start(const Napi::CallbackInfo& info) {
   Napi::Env env = info.Env();
   Napi::HandleScope scope(env);
 
-  this->socket_->Start();
+  socket_->Start();
 
   return Napi::Value();
 }
@@ -118,7 +118,7 @@ Napi::Value Socket_Wrap::Stop(const Napi::CallbackInfo& info) {
   Napi::Env env = info.Env();
   Napi::HandleScope scope(env);
 
-  this->socket_->Stop();
+  socket_->Stop();
 
   return Napi::Value();
 }
