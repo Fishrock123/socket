@@ -20,6 +20,8 @@ class Server_Wrap : public Napi::ObjectWrap<Server_Wrap> {
   Napi::Reference<Napi::Value> self_;
 
   Server* server_;
+  
+  sockaddr addr_;
 
   Napi::FunctionReference cb_ref_;
   Napi::Env env_;

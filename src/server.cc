@@ -28,11 +28,16 @@ void Server::Listen(sockaddr* addr, void* data, server_connection_cb_t callback)
   
   connection_cb_data_ = cb_data;
 
-  uv_tcp_bind(tcp_, addr, 0);
-  printf("Bound to addr...\n");
+  int bind_status = uv_tcp_bind(tcp_, addr, 0);
+  if (bind_status != 0) {
+    printf("Bind Error: %s - %s\n", uv_strerror(bind_status), uv_err_name(bind_status));
+    return;
+  } else {
+    printf("Bound to addr...\n");
+  }
 
   uv_stream_t* stream = reinterpret_cast<uv_stream_t*>(tcp_);
-  uv_listen(stream, DEFAULT_BACKLOG, [](uv_stream_t* server, int status) {
+  int listen_status = uv_listen(stream, DEFAULT_BACKLOG, [](uv_stream_t* server, int status) {
     if (status != 0) {
       printf("Connection Error: %s - %s\n", uv_strerror(status), uv_err_name(status));
       return;
@@ -50,8 +55,12 @@ void Server::Listen(sockaddr* addr, void* data, server_connection_cb_t callback)
     
     self->connection_cb_data_->callback(socket, self->connection_cb_data_->data);
   });
-  
-  printf("Did listen setup...\n");
+  if (listen_status != 0) {
+    printf("Listen Error: %s - %s\n", uv_strerror(listen_status), uv_err_name(listen_status));
+    return;
+  } else {
+    printf("Did listen setup...\n");
+  }
 }
 
 void Server::Close(void* data, server_shutdown_cb_t callback) {

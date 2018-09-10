@@ -64,7 +64,7 @@ Napi::Value Server_Wrap::Listen(const Napi::CallbackInfo& info) {
   
   printf("Setup JS CB...\n");
 
-  sockaddr_in* addr_in = new sockaddr_in;
+  sockaddr_in* addr_in = reinterpret_cast<sockaddr_in *>(&addr_);
 
   const uint32_t port = info[1].ToNumber().Uint32Value();
   const char* ip = info[0].ToString().Utf8Value().c_str();
@@ -76,11 +76,10 @@ Napi::Value Server_Wrap::Listen(const Napi::CallbackInfo& info) {
     printf("IPv4 ADDR: %s - %s\n", uv_strerror(err), uv_err_name(err));
     assert(false);
   }
-  sockaddr* addr = reinterpret_cast<sockaddr *>(&addr_in);
   
   printf("Setup addr...\n");
 
-  server_->Listen(addr, cb_data, [](Socket* socket, void* cb_data) {
+  server_->Listen(&addr_, cb_data, [](Socket* socket, void* cb_data) {
     if (cb_data != nullptr) {
       Server_Wrap* self = static_cast<Server_Wrap*>(cb_data);
       Napi::HandleScope scope(self->env_);
