@@ -59,6 +59,7 @@ void Socket_Source::OnUVRead(ssize_t nread, const uv_buf_t *buf) {
   int ret_status = nread != UV_EOF ? BOB::Status::CONTINUE : BOB::Status::END;
 
   if (ret_status == BOB::Status::END) {
+    printf("Closed handle from EOF\n");
     uv_handle_t* handle = reinterpret_cast<uv_handle_t *>(tcp_);
     uv_close(handle, [](uv_handle_t* handle) {});
   }

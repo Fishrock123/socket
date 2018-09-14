@@ -50,6 +50,10 @@ void Socket_Sink::Next(int bob_status, void** error, char* data, size_t bytes) {
 
   w_req_->data = static_cast<void*>(this);
 
+  uv_os_fd_t fd;
+  uv_fileno(reinterpret_cast<uv_handle_t*>(tcp_), &fd);
+  printf("Write fd: %i\n", fd);
+
   uv_stream_t* stream = reinterpret_cast<uv_stream_t*>(tcp_);
   if (bob_status != BOB::CONTINUE) {
     err = uv_write(w_req_, 
@@ -70,9 +74,6 @@ void Socket_Sink::Next(int bob_status, void** error, char* data, size_t bytes) {
   }
   if (err != 0) {
     printf("Socket write Error: %s - %s\n", uv_strerror(err), uv_err_name(err));
-    uv_os_fd_t fd;
-    uv_fileno(reinterpret_cast<uv_handle_t*>(tcp_), &fd);
-    printf("Write fd: %i\n", fd);
     return;
   }
 }

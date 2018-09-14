@@ -22,20 +22,28 @@ class BufferedSource extends EventEmitter {
     }
 
     pull(error, buffer) {
+        console.log('bs got pull')
         if (error) {
             return this.sink.next(status_type.error, error)
         }
+        
+        if (this.ended) {
+            console.log('ending')
+            return this.sink.next(status_type.end, null, buffer, 0)
+        }
 
         if (!this.bytesToWrite) {
-          if (this.ended) {
-            return this.sink.next(status_type.end, null, buffer, 0)
-          } else {
-            return this.once('send', _ => this.pull(error, buffer))
-          }
+            return this.once('send', _ => {
+                console.log('delayed pulling')
+                this.pull(error, buffer)
+            })
         }
 
         const bytesWritten = this.buffer.copy(buffer, 0, 0, this.bytesToWrite)
         this.bytesToWrite -= bytesWritten
+        
+        console.log('writing')
+        console.log(buffer.slice(0, bytesWritten).toString())
 
         this.sink.next(status_type.continue, null, buffer, bytesWritten)
 
@@ -64,6 +72,7 @@ class BufferedSource extends EventEmitter {
 
     end() {
       this.ended = true
+      this.emit('send')
     }
 }
 

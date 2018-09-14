@@ -2,7 +2,7 @@
 
 const util = require('util')
 
-const StdoutSink = require('./stdout-sink')
+const HttpAcceptSink = require('./http-accept-sink')
 
 const BufferedSource = require('./buffered-source')
 
@@ -19,24 +19,30 @@ const port = Number(process.argv[3])
 const server = new Server()
 
 server.listen(ip, port, socket => {
+  try {
   console.log("Got connection...")
-  const stdout = new StdoutSink()
+  const httpAccept = new HttpAcceptSink()
   const queue = new BufferedSource()
   
   socket.sink.bindSource(queue)
-  stdout.bindSource(socket.source, error => {
+  httpAccept.bindSource(socket.source, error => {
     if (error) {
       console.error('ERROR!', error)
     }
+    console.log('input end')
+  })
+  
+  httpAccept.on('header', header => {
+    console.log('sending http response')
+
+    queue.send("HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 13\n\nHello world!\n")
+    queue.end()
   })
   
   socket.start()
-  stdout.start()
-  
-  console.log('sending http response')
-
-  queue.send("HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!")
-
-  queue.send('\r\n')
-  queue.end()
+  httpAccept.start()
+  } catch (err) {
+    console.error(err)
+    throw(err)
+  }
 })
