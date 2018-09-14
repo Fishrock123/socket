@@ -32,6 +32,8 @@ server.listen(ip, port, socket => {
   
   socket.start()
   stdout.start()
+  
+  console.log('sending http response')
 
   queue.send("HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!")
 

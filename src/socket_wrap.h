@@ -11,7 +11,8 @@ class Socket_Wrap : public Napi::ObjectWrap<Socket_Wrap> {
   static Socket_Wrap* New(Socket* socket);
   Socket_Wrap(const Napi::CallbackInfo& info);
   
-  void ResetSocket(Socket* socket);
+  void InitSocket(Socket* socket);
+  void InitSocket();
   Napi::Value Value();
 
  private:

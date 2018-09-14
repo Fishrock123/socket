@@ -17,6 +17,7 @@ typedef struct socket_connect_cb_data_t {
 class Socket {
  public:
   Socket(uv_loop_t* loop, uint32_t bufsize);
+  Socket(uv_tcp_t* tcp, uint32_t bufsize);
   virtual ~Socket();
 
   virtual void Connect(sockaddr* addr, void* data, socket_connect_cb_t callback);
@@ -27,8 +28,6 @@ class Socket {
   Socket_Sink* sink_;
 
 private:
-  sockaddr* addr_;
-
   uv_tcp_t* tcp_;
   uv_connect_t req_;
   uv_buf_t buf_;

@@ -24,33 +24,12 @@ Napi::Object Socket_Wrap::Init(Napi::Env env, Napi::Object exports) {
 
 Socket_Wrap::Socket_Wrap(const Napi::CallbackInfo& info)
     : Napi::ObjectWrap<Socket_Wrap>(info),
+      socket_(nullptr),
       env_(info.Env()) {
   Napi::Env env = env_;
   Napi::HandleScope scope(env);
   
   self_ = Napi::Persistent(info.This());
-
-  uv_loop_t* loop;
-  napi_status status;
-  status = napi_get_uv_event_loop(env, &loop);
-  NAPI_CHECK(status, env);
-
-  socket_ = new Socket(loop, 1024);
-
-  Napi::Object self = info.This().ToObject();
-
-  Napi::Function PassTCtr = Napi::Value::From(env, PassThrough::CreateClass(env)).As<Napi::Function>();
-
-  Napi::Value source = Napi::Value::From(env, PassTCtr.New(0, {}));
-  source_pt_ = Napi::ObjectWrap<PassThrough>::Unwrap(source.ToObject());
-  self.DefineProperty(Napi::PropertyDescriptor::Value("source", source_pt_->GetJSObject(env)));
-
-  Napi::Value sink = Napi::Value::From(env, PassTCtr.New(0, {}));
-  sink_pt_ = Napi::ObjectWrap<PassThrough>::Unwrap(sink.ToObject());
-  self.DefineProperty(Napi::PropertyDescriptor::Value("sink", sink_pt_->GetJSObject(env)));
-
-  socket_->sink_->BindSource(sink_pt_);
-  source_pt_->BindSource(socket_->source_);
 }
 
 Socket_Wrap* Socket_Wrap::New(Socket* socket) {
@@ -58,14 +37,9 @@ Socket_Wrap* Socket_Wrap::New(Socket* socket) {
   
   Socket_Wrap* self = Napi::ObjectWrap<Socket_Wrap>::Unwrap(js_this);
   
-  self->ResetSocket(socket);
+  self->InitSocket(socket);
   
   return self;
-}
-
-void Socket_Wrap::ResetSocket(Socket* socket) {
-  delete socket_;
-  socket_ = socket;
 }
 
 Napi::Value Socket_Wrap::Connect(const Napi::CallbackInfo& info) {
@@ -105,6 +79,8 @@ Napi::Value Socket_Wrap::Connect(const Napi::CallbackInfo& info) {
   }
   sockaddr* addr = reinterpret_cast<sockaddr *>(&addr_in);
 
+  InitSocket();
+
   socket_->Connect(addr, cb_data, [](int status, void* cb_data) {
     if (cb_data != nullptr) {
       Socket_Wrap* self = static_cast<Socket_Wrap*>(cb_data);
@@ -118,6 +94,36 @@ Napi::Value Socket_Wrap::Connect(const Napi::CallbackInfo& info) {
   });
 
   return Napi::Value();
+}
+
+void Socket_Wrap::InitSocket() {
+  uv_loop_t* loop;
+  napi_status status;
+  status = napi_get_uv_event_loop(env_, &loop);
+  NAPI_CHECK(status, env_);
+
+  InitSocket(new Socket(loop, 1024));
+}
+
+void Socket_Wrap::InitSocket(Socket* socket) {
+  assert(socket_ == nullptr);
+  
+  socket_ = socket;
+
+  Napi::Object self = self_.Value().ToObject();
+
+  Napi::Function PassTCtr = Napi::Value::From(env_, PassThrough::CreateClass(env_)).As<Napi::Function>();
+
+  Napi::Value source = Napi::Value::From(env_, PassTCtr.New(0, {}));
+  source_pt_ = Napi::ObjectWrap<PassThrough>::Unwrap(source.ToObject());
+  self.DefineProperty(Napi::PropertyDescriptor::Value("source", source_pt_->GetJSObject(env_)));
+
+  Napi::Value sink = Napi::Value::From(env_, PassTCtr.New(0, {}));
+  sink_pt_ = Napi::ObjectWrap<PassThrough>::Unwrap(sink.ToObject());
+  self.DefineProperty(Napi::PropertyDescriptor::Value("sink", sink_pt_->GetJSObject(env_)));
+
+  socket_->sink_->BindSource(sink_pt_);
+  source_pt_->BindSource(socket_->source_);
 }
 
 Napi::Value Socket_Wrap::Start(const Napi::CallbackInfo& info) {

@@ -17,15 +17,6 @@ try {
 
 const socket = new Socket()
 
-socket.sink.bindSource(queue)
-stdout.bindSource(socket.source, error => {
-  if (error)
-    console.error('ERROR!', error)
-  else {
-    console.log('done')
-  }
-})
-
 const ip = process.argv[2]
 const port = Number(process.argv[3])
 const method = 'GET'
@@ -37,6 +28,15 @@ socket.connect(ip, port, connect_err => {
     console.error('Connect error:', util.getSystemErrorName(connect_err))
     return
   }
+  
+  socket.sink.bindSource(queue)
+  stdout.bindSource(socket.source, error => {
+    if (error)
+      console.error('ERROR!', error)
+    else {
+      console.log('done')
+    }
+  })
 
   socket.start()
   stdout.start()

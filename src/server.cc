@@ -51,7 +51,7 @@ void Server::Listen(sockaddr* addr, void* data, server_connection_cb_t callback)
     
     uv_accept(server, reinterpret_cast<uv_stream_t*>(client));
     
-    Socket* socket = new Socket(self->loop_, 1024);
+    Socket* socket = new Socket(client, 1024);
     
     self->connection_cb_data_->callback(socket, self->connection_cb_data_->data);
   });
@@ -76,6 +76,5 @@ void Server::Close(void* data, server_shutdown_cb_t callback) {
     if (callback != nullptr) {
         callback(status, data->data);
     }
-    delete data;
   });
 }

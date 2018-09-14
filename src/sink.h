@@ -16,13 +16,14 @@ class Socket_Sink : public BOB::Base {
   void Start();
 
   virtual void OnUVWrite();
+  virtual void ShutdownOnUVWrite();
 
  private:
   BOB::Base *source_;
 
   uv_tcp_t* tcp_;
-  uv_write_t w_req_;
-  uv_shutdown_t s_req_;
+  uv_write_t* w_req_;
+  uv_shutdown_t* s_req_;
 
   uv_buf_t buf_;
 };
