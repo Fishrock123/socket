@@ -46,6 +46,7 @@ void Socket_Source::Pull(void** error, char* data, size_t size) {
   err = uv_read_start(stream, [](uv_handle_t *handle,
                                  size_t suggested_size,
                                  uv_buf_t *buf) {
+    // XXX This obviously leaks an extreme amount of memory
     buf->base = reinterpret_cast<char*>(malloc(suggested_size));
     buf->len = suggested_size;
   }, [](uv_stream_t* stream,
