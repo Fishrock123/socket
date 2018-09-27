@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <napi.h>
 #include <node_api.h>
 #include "socket_wrap.h"
@@ -28,17 +29,17 @@ Socket_Wrap::Socket_Wrap(const Napi::CallbackInfo& info)
       env_(info.Env()) {
   Napi::Env env = env_;
   Napi::HandleScope scope(env);
-  
+
   self_ = Napi::Persistent(info.This());
 }
 
 Socket_Wrap* Socket_Wrap::New(Socket* socket) {
   Napi::Object js_this = constructor.Value().New(0, {});
-  
+
   Socket_Wrap* self = Napi::ObjectWrap<Socket_Wrap>::Unwrap(js_this);
-  
+
   self->InitSocket(socket);
-  
+
   return self;
 }
 
@@ -107,7 +108,7 @@ void Socket_Wrap::InitSocket() {
 
 void Socket_Wrap::InitSocket(Socket* socket) {
   assert(socket_ == nullptr);
-  
+
   socket_ = socket;
 
   Napi::Object self = self_.Value().ToObject();

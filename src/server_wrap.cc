@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <napi.h>
 #include <node_api.h>
 #include "server_wrap.h"
@@ -26,7 +27,7 @@ Server_Wrap::Server_Wrap(const Napi::CallbackInfo& info)
       env_(info.Env()) {
   Napi::Env env = env_;
   Napi::HandleScope scope(env);
-  
+
   self_ = Napi::Persistent(info.This());
 
   uv_loop_t* loop;
@@ -50,7 +51,7 @@ Napi::Value Server_Wrap::Listen(const Napi::CallbackInfo& info) {
   } if (!info[1].IsNumber()) {
     Napi::TypeError::New(env, "Server.Listen() expected argument [1] to be Number").ThrowAsJavaScriptException();
   }
-  
+
   printf("Basic typechecks...\n");
 
   void* cb_data = nullptr;
@@ -61,7 +62,7 @@ Napi::Value Server_Wrap::Listen(const Napi::CallbackInfo& info) {
 
     cb_data = static_cast<void*>(this);
   }
-  
+
   printf("Setup JS CB...\n");
 
   sockaddr_in* addr_in = reinterpret_cast<sockaddr_in *>(&addr_);
@@ -76,7 +77,7 @@ Napi::Value Server_Wrap::Listen(const Napi::CallbackInfo& info) {
     printf("IPv4 ADDR: %s - %s\n", uv_strerror(err), uv_err_name(err));
     assert(false);
   }
-  
+
   printf("Setup addr...\n");
 
   server_->Listen(&addr_, cb_data, [](Socket* socket, void* cb_data) {
@@ -88,13 +89,13 @@ Napi::Value Server_Wrap::Listen(const Napi::CallbackInfo& info) {
 
       size_t argc = 1;
       napi_value argv = socket_wrap->Value();
-      
+
       printf("Listen CB...\n");
-      
+
       self->cb_ref_.Value().MakeCallback(Napi::Object::New(self->env_), argc, &argv);
     }
   });
-  
+
   printf("Started Listening...\n");
 
   return Napi::Value();
@@ -110,7 +111,7 @@ Napi::Value Server_Wrap::Close(const Napi::CallbackInfo& info) {
       printf("Shutdown Error: %s - %s\n", uv_strerror(status), uv_err_name(status));
     }
   });
-  
+
   cb_ref_.Unref();
 
   return Napi::Value();

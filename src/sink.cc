@@ -1,5 +1,6 @@
 #include <uv.h>
 #include <assert.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include "sink.h"
 #include "socket.h"
@@ -56,20 +57,20 @@ void Socket_Sink::Next(int bob_status, void** error, char* data, size_t bytes) {
 
   uv_stream_t* stream = reinterpret_cast<uv_stream_t*>(tcp_);
   if (bob_status != BOB::CONTINUE) {
-    err = uv_write(w_req_, 
-                  stream, 
-                  &buf, 
-                  1u, 
+    err = uv_write(w_req_,
+                  stream,
+                  &buf,
+                  1u,
                   [](uv_write_t* req, int status) {
-      static_cast<Socket_Sink*>(req->data)->ShutdownOnUVWrite(); 
+      static_cast<Socket_Sink*>(req->data)->ShutdownOnUVWrite();
     });
   } else {
-    err = uv_write(w_req_, 
-                  stream, 
-                  &buf, 
-                  1u, 
+    err = uv_write(w_req_,
+                  stream,
+                  &buf,
+                  1u,
                   [](uv_write_t* req, int status) {
-      static_cast<Socket_Sink*>(req->data)->OnUVWrite(); 
+      static_cast<Socket_Sink*>(req->data)->OnUVWrite();
     });
   }
   if (err != 0) {
@@ -85,9 +86,9 @@ void Socket_Sink::OnUVWrite() {
 
 void Socket_Sink::ShutdownOnUVWrite() {
   int err;
-  
+
   s_req_ = new uv_shutdown_t;
-  
+
   uv_stream_t* stream = reinterpret_cast<uv_stream_t*>(tcp_);
   err = uv_shutdown(s_req_, stream, [](uv_shutdown_t* req, int status) {
     if (status != 0) {
