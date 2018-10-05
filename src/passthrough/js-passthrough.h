@@ -14,7 +14,7 @@ class PassThrough : public BOB::Base {
   virtual void Next(int status, void** error, char* data, size_t bytes);
   virtual void Pull(void** error, char* data, size_t size);
 
-  static napi_value CreateClass(napi_env env); 
+  static napi_value CreateClass(napi_env env);
 
   static void Destructor(napi_env env, void* nativeObject, void* finalize_hint);
 
