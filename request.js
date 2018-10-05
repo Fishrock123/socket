@@ -28,7 +28,7 @@ socket.connect(ip, port, connect_err => {
     console.error('Connect error:', util.getSystemErrorName(connect_err))
     return
   }
-  
+
   socket.sink.bindSource(queue)
   stdout.bindSource(socket.source, error => {
     if (error)
@@ -42,7 +42,7 @@ socket.connect(ip, port, connect_err => {
   stdout.start()
 
   queue.send(`${method} ${path} HTTP/1.1\r\nHost: ${ip}\r\nConnection: keep-alive\r\n`)
-  
+
   if (filePath !== null) {
     const FileSource = require('fs-source')
 

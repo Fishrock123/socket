@@ -26,7 +26,7 @@ class BufferedSource extends EventEmitter {
         if (error) {
             return this.sink.next(status_type.error, error)
         }
-        
+
         if (this.ended) {
             console.log('ending')
             return this.sink.next(status_type.end, null, buffer, 0)
@@ -41,7 +41,7 @@ class BufferedSource extends EventEmitter {
 
         const bytesWritten = this.buffer.copy(buffer, 0, 0, this.bytesToWrite)
         this.bytesToWrite -= bytesWritten
-        
+
         console.log('writing')
         console.log(buffer.slice(0, bytesWritten).toString())
 

@@ -2,9 +2,9 @@
 
 const util = require('util')
 
-const HttpAcceptSink = require('./http-accept-sink')
+const HttpAcceptSink = require('./helpers/http-accept-sink')
 
-const BufferedSource = require('./buffered-source')
+const BufferedSource = require('./helpers/buffered-source')
 
 let Server
 try {
@@ -23,7 +23,7 @@ server.listen(ip, port, socket => {
   console.log("Got connection...")
   const httpAccept = new HttpAcceptSink()
   const queue = new BufferedSource()
-  
+
   socket.sink.bindSource(queue)
   httpAccept.bindSource(socket.source, error => {
     if (error) {
@@ -31,14 +31,14 @@ server.listen(ip, port, socket => {
     }
     console.log('input end')
   })
-  
+
   httpAccept.on('header', header => {
     console.log('sending http response')
 
     queue.send("HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 13\n\nHello world!\n")
     queue.end()
   })
-  
+
   socket.start()
   httpAccept.start()
   } catch (err) {

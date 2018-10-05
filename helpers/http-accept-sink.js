@@ -10,7 +10,7 @@ class HttpAcceptSink extends EventEmitter {
 
         this.source = null
         this.bindCb = null
-        
+
         this.header = null
 
         try {
