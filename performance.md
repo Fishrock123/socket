@@ -10,7 +10,7 @@ Extra info:
 
 ## Profiles
 
-### `streams3-test.js`
+### `test/streams3-test.js`
 
 [Profile using 1.04GB file](profiles/streams3-prof)
 
@@ -20,7 +20,7 @@ Output from `/usr/bin/time`:
 ```
 
 
-### `index.js` _(bob socket)_
+### `request.js` _(bob socket)_
 
 [Profile using 1.04GB file](profiles/bob-prof)
 

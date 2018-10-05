@@ -2,10 +2,10 @@
 
 const util = require('util')
 
-const StdoutSink = require('./stdout-sink')
+const StdoutSink = require('./helpers/stdout-sink')
 const stdout = new StdoutSink()
 
-const BufferedSource = require('./buffered-source')
+const BufferedSource = require('./helpers/buffered-source')
 const queue = new BufferedSource()
 
 let Socket
