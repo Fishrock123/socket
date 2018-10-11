@@ -52,8 +52,6 @@ Napi::Value Server_Wrap::Listen(const Napi::CallbackInfo& info) {
     Napi::TypeError::New(env, "Server.Listen() expected argument [1] to be Number").ThrowAsJavaScriptException();
   }
 
-  printf("Basic typechecks...\n");
-
   void* cb_data = nullptr;
   if (!info[2].IsFunction()) {
     Napi::TypeError::New(env, "Server.Listen() expected argument [2] to be Function").ThrowAsJavaScriptException();
@@ -63,22 +61,16 @@ Napi::Value Server_Wrap::Listen(const Napi::CallbackInfo& info) {
     cb_data = static_cast<void*>(this);
   }
 
-  printf("Setup JS CB...\n");
-
   sockaddr_in* addr_in = reinterpret_cast<sockaddr_in *>(&addr_);
 
   const uint32_t port = info[1].ToNumber().Uint32Value();
   const char* ip = info[0].ToString().Utf8Value().c_str();
-
-  printf("C++ got addr info - port: %u, ip: %s\n", port, ip);
 
   int err = uv_ip4_addr(ip, port, addr_in);
   if (err != 0) {
     printf("IPv4 ADDR: %s - %s\n", uv_strerror(err), uv_err_name(err));
     assert(false);
   }
-
-  printf("Setup addr...\n");
 
   server_->Listen(&addr_, cb_data, [](Socket* socket, void* cb_data) {
     if (cb_data != nullptr) {
@@ -90,13 +82,9 @@ Napi::Value Server_Wrap::Listen(const Napi::CallbackInfo& info) {
       size_t argc = 1;
       napi_value argv = socket_wrap->Value();
 
-      printf("Listen CB...\n");
-
       self->cb_ref_.Value().MakeCallback(Napi::Object::New(self->env_), argc, &argv);
     }
   });
-
-  printf("Started Listening...\n");
 
   return Napi::Value();
 }

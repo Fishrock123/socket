@@ -32,8 +32,6 @@ void Server::Listen(sockaddr* addr, void* data, server_connection_cb_t callback)
   if (bind_status != 0) {
     printf("Bind Error: %s - %s\n", uv_strerror(bind_status), uv_err_name(bind_status));
     return;
-  } else {
-    printf("Bound to addr...\n");
   }
 
   uv_stream_t* stream = reinterpret_cast<uv_stream_t*>(tcp_);
@@ -42,7 +40,6 @@ void Server::Listen(sockaddr* addr, void* data, server_connection_cb_t callback)
       printf("Connection Error: %s - %s\n", uv_strerror(status), uv_err_name(status));
       return;
     }
-    printf("Got connection from libuv.\n");
 
     Server* self = reinterpret_cast<Server*>(server->data);
 
@@ -58,8 +55,6 @@ void Server::Listen(sockaddr* addr, void* data, server_connection_cb_t callback)
   if (listen_status != 0) {
     printf("Listen Error: %s - %s\n", uv_strerror(listen_status), uv_err_name(listen_status));
     return;
-  } else {
-    printf("Did listen setup...\n");
   }
 }
 

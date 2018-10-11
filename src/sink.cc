@@ -53,7 +53,6 @@ void Socket_Sink::Next(int bob_status, void** error, char* data, size_t bytes) {
 
   uv_os_fd_t fd;
   uv_fileno(reinterpret_cast<uv_handle_t*>(tcp_), &fd);
-  printf("Write fd: %i\n", fd);
 
   uv_stream_t* stream = reinterpret_cast<uv_stream_t*>(tcp_);
   if (bob_status != BOB::CONTINUE) {
@@ -93,8 +92,6 @@ void Socket_Sink::ShutdownOnUVWrite() {
   err = uv_shutdown(s_req_, stream, [](uv_shutdown_t* req, int status) {
     if (status != 0) {
       printf("Shutdown: %s\n", uv_err_name(status));
-    } else {
-      printf("Clean shutdown\n");
     }
   });
   if (err != 0) {
