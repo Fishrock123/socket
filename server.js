@@ -20,27 +20,24 @@ const server = new Server()
 
 server.listen(ip, port, socket => {
   try {
-  console.log("Got connection...")
-  const httpAccept = new HttpAcceptSink()
-  const queue = new BufferedSource()
+    const httpAccept = new HttpAcceptSink()
+    const queue = new BufferedSource()
 
-  socket.sink.bindSource(queue)
-  httpAccept.bindSource(socket.source, error => {
-    if (error) {
-      console.error('ERROR!', error)
-    }
-    console.log('input end')
-  })
+    socket.sink.bindSource(queue)
+    httpAccept.bindSource(socket.source, error => {
+      if (error) {
+        console.error('ERROR!', error)
+      }
+      // Close socket if necessary
+    })
 
-  httpAccept.on('header', header => {
-    console.log('sending http response')
+    httpAccept.on('header', header => {
+      queue.send("HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 13\n\nHello world!\n")
+      queue.end()
+    })
 
-    queue.send("HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 13\n\nHello world!\n")
-    queue.end()
-  })
-
-  socket.start()
-  httpAccept.start()
+    socket.start()
+    httpAccept.start()
   } catch (err) {
     console.error(err)
     throw(err)
